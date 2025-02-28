@@ -40,4 +40,13 @@ public class CategoryService {
         entity = categoryRepository.save(entity);
         return new CategoryDTO(entity);
     }
+
+    @Transactional
+    public CategoryDTO update(Long id, CategoryDTO categoryDTO) {
+        Category entity = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Id not found " + id));
+        entity.setName(categoryDTO.getName());
+        entity = categoryRepository.save(entity);
+        return new CategoryDTO(entity);
+    }
 }
