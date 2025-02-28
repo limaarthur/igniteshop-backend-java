@@ -2,6 +2,7 @@ package com.ignite.igniteshop.services;
 
 import com.ignite.igniteshop.dtos.CategoryDTO;
 import com.ignite.igniteshop.entities.Category;
+import com.ignite.igniteshop.services.exceptions.ResourceNotFoundException;
 import com.ignite.igniteshop.repositories.CategoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ public class CategoryService {
     @Transactional(readOnly = true)
     public CategoryDTO findById(Long id) {
         Optional<Category> optionalCategory = categoryRepository.findById(id);
-        Category category = optionalCategory.get();
+        Category category = optionalCategory.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
         return new CategoryDTO(category);
     }
 }
