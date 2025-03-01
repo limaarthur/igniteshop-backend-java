@@ -1,7 +1,10 @@
 package com.ignite.igniteshop.services;
 
+import com.ignite.igniteshop.dtos.CategoryDTO;
 import com.ignite.igniteshop.dtos.ProductDTO;
+import com.ignite.igniteshop.entities.Category;
 import com.ignite.igniteshop.entities.Product;
+import com.ignite.igniteshop.repositories.CategoryRepository;
 import com.ignite.igniteshop.repositories.ProductRepository;
 import com.ignite.igniteshop.services.exceptions.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
@@ -18,8 +21,11 @@ public class ProductService {
 
     private ProductRepository productRepository;
 
-    public ProductService(ProductRepository productRepository) {
+    private CategoryRepository categoryRepository;
+
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Transactional(readOnly = true)
@@ -39,10 +45,7 @@ public class ProductService {
     @Transactional()
     public ProductDTO insert(ProductDTO productDTO) {
         Product entity = new Product();
-        entity.setName(productDTO.getName());
-        entity.setDescription(productDTO.getDescription());
-        entity.setPrice(productDTO.getPrice());
-        entity.setImgUrl(productDTO.getImgUrl());
+        copyDtoToEntity(productDTO, entity);
         entity = productRepository.save(entity);
         return new ProductDTO(entity);
     }
@@ -51,10 +54,7 @@ public class ProductService {
     public ProductDTO update(Long id, ProductDTO productDTO) {
         Product entity = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Id not found " + id));
-        entity.setName(productDTO.getName());
-        entity.setDescription(productDTO.getDescription());
-        entity.setPrice(productDTO.getPrice());
-        entity.setImgUrl(productDTO.getImgUrl());
+        copyDtoToEntity(productDTO, entity);
         entity = productRepository.save(entity);
         return new ProductDTO(entity);
     }
@@ -63,5 +63,19 @@ public class ProductService {
         Product entity = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Id not found " + id));
         productRepository.delete(entity);
+    }
+
+    private void copyDtoToEntity(ProductDTO productDTO, Product entity) {
+        entity.setName(productDTO.getName());
+        entity.setDescription(productDTO.getDescription());
+        entity.setDate(productDTO.getDate());
+        entity.setImgUrl(productDTO.getImgUrl());
+        entity.setPrice(productDTO.getPrice());
+
+        entity.getCategories().clear();
+        for (CategoryDTO categoryDTO : productDTO.getCategories()) {
+            Category category = categoryRepository.getReferenceById(categoryDTO.getId());
+            entity.getCategories().add(category);
+        }
     }
 }
