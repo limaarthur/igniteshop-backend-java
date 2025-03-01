@@ -33,7 +33,7 @@ public class ProductService {
     public ProductDTO findById(Long id) {
         Optional<Product> optionalProduct = productRepository.findById(id);
         Product product = optionalProduct.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
-        return new ProductDTO(product);
+        return new ProductDTO(product, product.getCategories());
     }
 
     @Transactional()
