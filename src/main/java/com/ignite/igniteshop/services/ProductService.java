@@ -9,7 +9,7 @@ import com.ignite.igniteshop.repositories.ProductRepository;
 import com.ignite.igniteshop.services.exceptions.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,10 +29,10 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProductDTO> findAllPaged(PageRequest pageRequest) {
-        Page<Product> productList = productRepository.findAll(pageRequest);
+    public Page<ProductDTO> findAllPaged(Pageable pageable) {
+        Page<Product> productList = productRepository.findAll(pageable);
         List<ProductDTO> productDTO = productList.map(product -> new ProductDTO(product)).toList();
-        return new PageImpl<>(productDTO, pageRequest, productList.getTotalElements());
+        return new PageImpl<>(productDTO, pageable, productList.getTotalElements());
     }
 
     @Transactional(readOnly = true)

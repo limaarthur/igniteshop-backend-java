@@ -6,7 +6,7 @@ import com.ignite.igniteshop.services.exceptions.ResourceNotFoundException;
 import com.ignite.igniteshop.repositories.CategoryRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,10 +23,10 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    public Page<CategoryDTO> findAllPaged(PageRequest pageRequest) {
-        Page<Category> categoryList = categoryRepository.findAll(pageRequest);
+    public Page<CategoryDTO> findAllPaged(Pageable pageable) {
+        Page<Category> categoryList = categoryRepository.findAll(pageable);
         List<CategoryDTO> categoryDTO = categoryList.map(category -> new CategoryDTO(category)).toList();
-        return new PageImpl<>(categoryDTO, pageRequest, categoryList.getTotalElements());
+        return new PageImpl<>(categoryDTO, pageable, categoryList.getTotalElements());
     }
 
     @Transactional(readOnly = true)
