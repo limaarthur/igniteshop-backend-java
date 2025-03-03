@@ -6,7 +6,10 @@ import com.ignite.igniteshop.entities.Category;
 import com.ignite.igniteshop.entities.Product;
 import com.ignite.igniteshop.repositories.CategoryRepository;
 import com.ignite.igniteshop.repositories.ProductRepository;
+import com.ignite.igniteshop.services.exceptions.DataBaseException;
 import com.ignite.igniteshop.services.exceptions.ResourceNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -60,9 +63,15 @@ public class ProductService {
     }
 
     public void delete(Long id) {
-        Product entity = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Id not found " + id));
-        productRepository.delete(entity);
+        try {
+            productRepository.deleteById(id);
+        }
+        catch (EmptyResultDataAccessException e) {
+            throw new ResourceNotFoundException("Id not found " + id);
+        }
+        catch (DataIntegrityViolationException e) {
+            throw new DataBaseException("Integrity violation");
+        }
     }
 
     private void copyDtoToEntity(ProductDTO productDTO, Product entity) {

@@ -2,8 +2,11 @@ package com.ignite.igniteshop.services;
 
 import com.ignite.igniteshop.dtos.CategoryDTO;
 import com.ignite.igniteshop.entities.Category;
+import com.ignite.igniteshop.services.exceptions.DataBaseException;
 import com.ignite.igniteshop.services.exceptions.ResourceNotFoundException;
 import com.ignite.igniteshop.repositories.CategoryRepository;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -54,8 +57,13 @@ public class CategoryService {
     }
 
     public void delete(Long id) {
-        Category entity = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Id not found " + id));
-        categoryRepository.delete(entity);
+        try {
+            categoryRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ResourceNotFoundException("Id not found " + id);
+        }
+        catch (DataIntegrityViolationException e) {
+            throw new DataBaseException("Integrity violation");
+        }
     }
 }
