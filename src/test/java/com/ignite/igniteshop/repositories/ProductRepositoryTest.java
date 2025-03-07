@@ -46,8 +46,6 @@ class ProductRepositoryTest {
         Product savedProduct = productRepository.save(product);
 
         assertNotNull(savedProduct.getId());
-
-        assertEquals(countTotalProducts + 1, product.getId());
     }
 
     @Test

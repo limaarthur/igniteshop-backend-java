@@ -63,13 +63,10 @@ public class ProductService {
     }
 
     public void delete(Long id) {
-        if (!productRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Id not found " + id);
-        }
-        productRepository.deleteById(id);
-
         try {
             productRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ResourceNotFoundException("Id not found " + id);
         } catch (DataIntegrityViolationException e) {
             throw new DataBaseException("Integrity violation " + id);
         }
