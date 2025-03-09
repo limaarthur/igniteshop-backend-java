@@ -52,12 +52,29 @@ class ProductServiceTest {
 
         //Mockito.when(productRepository.save(ArgumentMatchers.any())).thenReturn(product);
 
-        //Mockito.when(productRepository.findById(existingId)).thenReturn(Optional.of(product));
-        //Mockito.when(productRepository.findById(nonExistingId)).thenReturn(Optional.empty());
+        Mockito.lenient().when(productRepository.findById(existingId)).thenReturn(Optional.of(product));
+        Mockito.lenient().when(productRepository.findById(nonExistingId)).thenReturn(Optional.empty());
 
         Mockito.lenient().doNothing().when(productRepository).deleteById(existingId);
         Mockito.lenient().doThrow(ResourceNotFoundException.class).when(productRepository).deleteById(nonExistingId);
         Mockito.lenient().doThrow(DataIntegrityViolationException.class).when(productRepository).deleteById(dependentId);
+    }
+
+    @Test
+    public void findByIdShouldReturnProductDTOWhenExisting() {
+
+        ProductDTO result = productService.findById(existingId);
+
+        Assertions.assertNotNull(result);
+    }
+
+    @Test
+    public void findByIdShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+
+            productService.findById(nonExistingId);
+        });
     }
 
     @Test
