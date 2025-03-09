@@ -5,6 +5,7 @@ import com.ignite.igniteshop.entities.Product;
 import com.ignite.igniteshop.repositories.ProductRepository;
 import com.ignite.igniteshop.services.exceptions.DataBaseException;
 import com.ignite.igniteshop.services.exceptions.ResourceNotFoundException;
+import com.ignite.igniteshop.tests.Factory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,19 +46,36 @@ class ProductServiceTest {
         existingId = 1L;
         nonExistingId = 1000L;
         dependentId = 3L;
-        product = new Product();
+        product = Factory.createdProduct();
         page = new PageImpl<>(List.of(product));
 
         Mockito.lenient().when(productRepository.findAll((Pageable)ArgumentMatchers.any())).thenReturn(page);
 
-        //Mockito.when(productRepository.save(ArgumentMatchers.any())).thenReturn(product);
+        Mockito.lenient().when(productRepository.save(ArgumentMatchers.any())).thenReturn(product);
 
-        //Mockito.when(productRepository.findById(existingId)).thenReturn(Optional.of(product));
-        //Mockito.when(productRepository.findById(nonExistingId)).thenReturn(Optional.empty());
+        Mockito.lenient().when(productRepository.findById(existingId)).thenReturn(Optional.of(product));
+        Mockito.lenient().when(productRepository.findById(nonExistingId)).thenReturn(Optional.empty());
 
         Mockito.lenient().doNothing().when(productRepository).deleteById(existingId);
         Mockito.lenient().doThrow(ResourceNotFoundException.class).when(productRepository).deleteById(nonExistingId);
         Mockito.lenient().doThrow(DataIntegrityViolationException.class).when(productRepository).deleteById(dependentId);
+    }
+
+    @Test
+    public void findByIdShouldReturnProductDTOWhenExisting() {
+
+        ProductDTO result = productService.findById(existingId);
+
+        Assertions.assertNotNull(result);
+    }
+
+    @Test
+    public void findByIdShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+
+            productService.findById(nonExistingId);
+        });
     }
 
     @Test

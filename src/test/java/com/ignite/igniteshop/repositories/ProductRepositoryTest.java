@@ -1,14 +1,15 @@
 package com.ignite.igniteshop.repositories;
 
 import com.ignite.igniteshop.entities.Product;
-import com.ignite.igniteshop.services.ProductService;
 import com.ignite.igniteshop.services.exceptions.ResourceNotFoundException;
+import com.ignite.igniteshop.tests.Factory;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.Instant;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,53 +19,59 @@ class ProductRepositoryTest {
     @Autowired
     private ProductRepository productRepository;
 
-    @Autowired
-    private ProductService productService;
-
-    private long existsId;
-    private long nonExistentId;
+    private long existingId;
+    private long nonExistingId;
     private long countTotalProducts;
 
     @BeforeEach
-    public void setUp() {
-        existsId = 10L;
-        nonExistentId = 1000L;
+    void setUpBeforeClass() throws Exception {
+        existingId = 1L;
+        nonExistingId = 1000L;
         countTotalProducts = 35L;
     }
 
-    @Test
+    @Test // Método save deveria persistir com incremento automático quando o Id for nulo
     public void saveShouldPersistWithAutoincrementWhenIdIsNull() {
-        Product product = new Product(null,
-                "Phone",
-                "Good Phone",
-                800.0,
-                "https://img.com/img.jpg",
-                Instant.parse("2020-10-20T03:00:00Z"
-                ));
+
+        Product product = Factory.createdProduct();
         product.setId(null);
 
-        Product savedProduct = productRepository.save(product);
+        product = productRepository.save(product);
 
-        assertNotNull(savedProduct.getId());
+        Assertions.assertNotNull(product.getId());
+        Assertions.assertEquals(countTotalProducts + 1, product.getId());
     }
 
-    @Test
-    void deleteShouldDeleteObjectWhenIdExists() {
+    @Test // Método delete deve deletar objeto quando Id existir
+    public void deleteShouldDeleteObjectWhenIdExists() {
 
-        assertTrue(productRepository.existsById(existsId));
+        productRepository.deleteById(existingId);
 
-        productRepository.deleteById(existsId);
-
-        assertFalse(productRepository.existsById(existsId));
+        Optional<Product> result = productRepository.findById(existingId);
+        Assertions.assertFalse(result.isPresent());
     }
 
-    @Test
-    void deleteShouldThrowEmptyResultDataAccessExceptionWhenIdDoesNotExists() {
+    @Test // Método delete deve lançar uma exceçao quando Id não existir
+    public void deleteShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
 
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
-            productService.delete(nonExistentId);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+            productRepository.deleteById(nonExistingId);
         });
+    }
 
-        assertEquals("Id not found " + nonExistentId, exception.getMessage());
+    @Test // Método findById deveria retornar id quando o id existir
+    public void findByIdShouldReturnNonEmptyOptionalWhenIdExist() {
+
+        Optional<Product> result = productRepository.findById(existingId);
+
+        Assertions.assertTrue(result.isPresent());
+    }
+
+    @Test // Método não deveria retornar id quando a id não existe
+    public void findByIdShouldReturnEmptyOptionalWhenIdDoesNotExist() {
+
+        Optional<Product> result = productRepository.findById(nonExistingId);
+
+        Assertions.assertTrue(result.isEmpty());
     }
 }
