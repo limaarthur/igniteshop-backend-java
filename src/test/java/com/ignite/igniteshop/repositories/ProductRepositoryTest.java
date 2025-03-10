@@ -1,13 +1,13 @@
 package com.ignite.igniteshop.repositories;
 
 import com.ignite.igniteshop.entities.Product;
-import com.ignite.igniteshop.services.exceptions.ResourceNotFoundException;
 import com.ignite.igniteshop.tests.Factory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.util.Optional;
 
@@ -54,7 +54,7 @@ class ProductRepositoryTest {
     @Test // Método delete deve lançar uma exceçao quando Id não existir
     public void deleteShouldThrowResourceNotFoundExceptionWhenIdDoesNotExist() {
 
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+        Assertions.assertThrows(EmptyResultDataAccessException.class, () -> {
             productRepository.deleteById(nonExistingId);
         });
     }
