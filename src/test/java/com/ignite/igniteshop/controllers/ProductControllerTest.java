@@ -18,6 +18,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 
@@ -26,7 +28,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.web.servlet.function.RequestPredicates.accept;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -69,6 +70,26 @@ class ProductControllerTest {
         Mockito.doNothing().when(productService).delete(existingId);
         Mockito.doThrow(ResourceNotFoundException.class).when(productService).delete(nonExistingId);
         Mockito.doThrow(DataBaseException.class).when(productService).delete(dependentId);
+    }
+
+    @Test
+    public void deleteShouldReturnNotContentWhenIdExists() throws Exception {
+
+        ResultActions result = mockMvc
+                .perform(MockMvcRequestBuilders.delete("/products/{id}", existingId)
+                        .accept(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
+
+    @Test
+    public void deleteShouldReturnNotFoundWhenIdDoesNotExists() throws Exception {
+
+        ResultActions result = mockMvc
+                .perform(MockMvcRequestBuilders.delete("/products/{id}", nonExistingId)
+                        .accept(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
     @Test
