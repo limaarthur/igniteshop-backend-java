@@ -3,6 +3,7 @@ package com.ignite.igniteshop.controllers;
 import com.ignite.igniteshop.dtos.UserDTO;
 import com.ignite.igniteshop.dtos.UserInsertDTO;
 import com.ignite.igniteshop.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO> insert(@RequestBody UserInsertDTO userInsertDTO) {
+    public ResponseEntity<UserDTO> insert(@Valid @RequestBody UserInsertDTO userInsertDTO) {
         UserDTO newUserDTO = userService.insert(userInsertDTO);
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -44,7 +45,7 @@ public class UserController {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody UserDTO userDTO) {
+    public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
         userDTO = userService.update(id, userDTO);
         return ResponseEntity.ok().body(userDTO);
     }

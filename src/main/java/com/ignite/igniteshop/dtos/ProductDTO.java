@@ -2,6 +2,10 @@ package com.ignite.igniteshop.dtos;
 
 import com.ignite.igniteshop.entities.Category;
 import com.ignite.igniteshop.entities.Product;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -12,14 +16,18 @@ public class ProductDTO {
 
     private Long id;
 
+    @Size(min = 5, max = 60, message = "O nome deve conter entre 5 e 60 caracteres")
+    @NotBlank(message = "Campo obrigatório")
     private String name;
 
     private String description;
 
+    @Positive(message = "O preço deve conter um valor positivo")
     private Double price;
 
     private String imgUrl;
 
+    @PastOrPresent(message = "Somente data atual")
     private Instant date;
 
     private List<CategoryDTO> categories = new ArrayList<>();
