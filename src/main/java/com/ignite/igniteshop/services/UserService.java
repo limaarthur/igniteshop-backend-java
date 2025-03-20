@@ -3,6 +3,7 @@ package com.ignite.igniteshop.services;
 import com.ignite.igniteshop.dtos.RoleDTO;
 import com.ignite.igniteshop.dtos.UserDTO;
 import com.ignite.igniteshop.dtos.UserInsertDTO;
+import com.ignite.igniteshop.dtos.UserUpdateDTO;
 import com.ignite.igniteshop.entities.Role;
 import com.ignite.igniteshop.entities.User;
 import com.ignite.igniteshop.repositories.RoleRepository;
@@ -57,10 +58,10 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO update(Long id, UserDTO userDTO) {
+    public UserDTO update(Long id, UserUpdateDTO userUpdateDTO) {
         User entity = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Id not found " + id));
-        copyDtoToEntity(userDTO, entity);
+        copyDtoToEntity(userUpdateDTO, entity);
         entity = userRepository.save(entity);
         return new UserDTO(entity);
     }

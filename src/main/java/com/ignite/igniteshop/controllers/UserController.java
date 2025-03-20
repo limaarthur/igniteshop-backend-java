@@ -2,6 +2,7 @@ package com.ignite.igniteshop.controllers;
 
 import com.ignite.igniteshop.dtos.UserDTO;
 import com.ignite.igniteshop.dtos.UserInsertDTO;
+import com.ignite.igniteshop.dtos.UserUpdateDTO;
 import com.ignite.igniteshop.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -45,9 +46,9 @@ public class UserController {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
-        userDTO = userService.update(id, userDTO);
-        return ResponseEntity.ok().body(userDTO);
+    public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO userUpdateDTO) {
+        UserDTO newUserDTO = userService.update(id, userUpdateDTO);
+        return ResponseEntity.ok().body(newUserDTO);
     }
 
     @DeleteMapping(value = "/{id}")
