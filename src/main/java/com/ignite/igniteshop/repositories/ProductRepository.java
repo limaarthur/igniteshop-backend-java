@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    @Query("SELECT obj FROM Product obj JOIN "
-            + "obj.categories cat WHERE cat = :category")
+    @Query("SELECT DISTINCT obj FROM Product obj JOIN obj.categories cat WHERE "
+            + "(:category IS NULL OR cat = :category)")
     Page<Product> find(@Param("category") Category category, Pageable pageable);
 }
