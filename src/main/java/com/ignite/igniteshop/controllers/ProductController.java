@@ -26,6 +26,7 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<Page<ProductDTO>> findAll(
             @RequestParam(value = "categoryId", defaultValue = "0") Long categoryId,
+            @RequestParam(value = "name", defaultValue = "") String name,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "linesPerPage", defaultValue = "12") Integer linesPerPage,
             @RequestParam(value = "direction", defaultValue = "ASC") String direction,
@@ -34,7 +35,7 @@ public class ProductController {
 
         PageRequest pageRequest = PageRequest.of(page, linesPerPage, Sort.Direction.valueOf(direction), orderBy);
 
-        Page<ProductDTO> pageResult = productService.findAllPaged(categoryId, pageRequest);
+        Page<ProductDTO> pageResult = productService.findAllPaged(categoryId, name, pageRequest);
 
         return ResponseEntity.ok(pageResult);
     }

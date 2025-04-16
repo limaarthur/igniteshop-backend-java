@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("SELECT DISTINCT obj FROM Product obj JOIN obj.categories cat WHERE "
-            + "(:category IS NULL OR cat = :category)")
-    Page<Product> find(@Param("category") Category category, Pageable pageable);
+            + "(:category IS NULL OR cat = :category) AND "
+            + "(LOWER(obj.name) LIKE LOWER(CONCAT('%',:name,'%')) )")
+    Page<Product> find(@Param("category") Category category, String name, Pageable pageable);
 }
