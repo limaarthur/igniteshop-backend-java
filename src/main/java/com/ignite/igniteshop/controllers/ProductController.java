@@ -35,7 +35,7 @@ public class ProductController {
 
         PageRequest pageRequest = PageRequest.of(page, linesPerPage, Sort.Direction.valueOf(direction), orderBy);
 
-        Page<ProductDTO> pageResult = productService.findAllPaged(categoryId, name, pageRequest);
+        Page<ProductDTO> pageResult = productService.findAllPaged(categoryId, name.trim(), pageRequest);
 
         return ResponseEntity.ok(pageResult);
     }
